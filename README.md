@@ -1,59 +1,83 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## پروژه تیکت ساده (ماژولار) (API)
 
-## About Laravel
+یک پروژه تیکت ساده می باشد. با قابلیت ورود و عضویت و ثبت تیکت!
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- پروژه بصورت ماژولار نوشته شده است، بدون پکیج
+- تکیت های دارای status های مختلف می باشند که بصورت enum در model تیکت درج شده است
+- کاربر بعد از عضویت می تواند تیکت ثبت کند
+- تکیت ها دارای یک عنوان و یک متن و یک فایل می باشند
+- سیستم عضویت و ورود کاربران در API توسط پکیج sanctum انجام شده است
+- دو سطح ادمین توسط seeder به سیستم اضافه شده است (مشخصات در پایین درج شده است)
+-  ادمین سطح اول می تواند تیکت ها را confirm بکند (تکی یا bulk)
+- ادمین سطح دوم می تواند تیکت ها را approve بکند (تکی یا bulk)
+- سیستم نقش ها و دسترسی ها توسط پکیج spatie پیاده سازی شده است
+- مرحله approve کردن تیکت ها در job تعریف شده است و بصورت صف اجرا می شود
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+  یک سرویس فرضی نوشته شده است که در زمان approve کردن تیکت ها بصورت شانسی عمل می کند و گاهی این عملیات را انجام نمی دهد. job مورد نظر در صورت ناموفق بودن approve یک job دیگر ایجاد می کند و بار دیگر تلاش می کند و این عملیات تا زمان approve شدن تیکت ادامه پیدا می کند! در هر بار تلاش نتیجه در log مخصوص تیکت ها نوشته می شود
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+  - برای ماژول تیکت ها Feature Test با phpunit نوشته شده است!
 
-## Learning Laravel
+## راه اندازی و تست
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+بعد clone کردن پروژه ، اطلاعات database را در فایل .env.example قرار داده و آن را به .env تغییرنام دهید. سپس در ترمینال پروژه این دستورات را وارد کنید:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+***
+composer dump-autoload
 
-## Laravel Sponsors
+php artisan key:generate
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+php artisan migrate:fresh --seed
 
-### Premium Partners
+php artisan optimize:clear
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+php artisan serve
+***
 
-## Contributing
+می توانید با برنامه هایی مثل postman یا bruno به پروژه درخواست بزنید.
+در صورت درست لود شدن پروژه می توانید با آدرس 127.0.0.1:8000/api/register اقدام به عضویت کنید صرفا با اطلاعات ذیل:
+***
+{
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+  "name":"test",
+  
+  "email":"test@mail.com",
+  
+  "password":"test1234",
+  
+  "password_confirmation":"test1234"
+  
+}
+****
+بعد از عضویت در response توکن مربوط رو هم دریافت خواهید کرد که در درخواست بعدی می بایست بصورت Bearer Token ارسال کنید. سپس با آدرس api/ticket می تواند به ایجاد تیکت اقدام بفرمائید. برای ثبت تیکت به ورودی های title,body,file نیازمند هستید که فایل می بایست عکس یا pdf باشد.
 
-## Code of Conduct
+## مرحله تایید تیکت ها
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+کاربران ادمین بصورت seeder در پروژه اضافه می شوند و اطلاعات آنها بصورت ذیل می باشد:
+***
+email => admin_level_one@mail.com
 
-## Security Vulnerabilities
+password => 12345678one
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+email => admin_level_two@mail.com
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+password => 12345678two
+***
+با ادمین اول لاگین شوید با آدرس api/login و سپس شما می تواند تیکت ها را confirm بکنید در آدرس api/ticket//{ticket}/confirm که می بایست بجای {ticket} آی دی تیکت را قرار دهید. برای تایید Bulk می توانید از آدرس api/ticket/bulkConfirm استفاده کنید که می بایست درخواست post بوده و آی دی تیکت هایی که می خواهید confirm شوند با در یک آرایه بنام tickets در درخواست ارسال کنید.
+
+با ادمین دوم اکنون می توانید لاگین شوید و نسبت به approve تیکت ها اقدام کنید به همان روش قبل با آدرس های api/ticket/{ticket}/approve و api/ticket/bulkApprove
+بعد از approve کردن تیکت های می بایست صف لاراول را نیز با دستور ذیل اجرا کنید تا صف اجرا شود:
+
+***
+php artisan queue:work
+***
+لاگ های مربوط به صف در storage/logs/tickets.log ذخیره خواهد شد.
+
+
+## تست کردن پروژه
+
+برای ماژول تیکت ها و برای چند متود آن تست نوشته شده است که می تواند با دستور زیر آنها اجرا کنید:
+***
+php artisan test
+***
