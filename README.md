@@ -81,3 +81,8 @@ php artisan queue:work
 ***
 php artisan test
 ***
+
+## فرانت پروژه
+
+یک فرانت ساده بصورت single page application هم در پروژه قرار داده شده است که می توانید در آدرس ذیل آن را مشاهده کنید:
+127.0.0.1:8000/app.html
