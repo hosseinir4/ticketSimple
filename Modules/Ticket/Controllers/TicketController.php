@@ -13,6 +13,19 @@ use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
+
+    public function tickets()
+    {
+        if (auth()->user()->hasAnyPermission('TicketLevelOne','TicketLevelTwo')) {
+            $tickets = Ticket::all();
+        } else {
+            $tickets = Ticket::where('user_id',auth()->user()->id)->get();
+        }
+        return response()->json(['data' => [
+            'tickets' => $tickets
+        ],'message' => 'Ticket fetched'],200);
+    }
+
     public function create(CreateRequests $request)
     {
         $ticket = Ticket::create([

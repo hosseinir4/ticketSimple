@@ -33,7 +33,7 @@ class TicketApproveJob implements ShouldQueue
         if ($res){
             Log::channel('tickets')->info('attrmpt to approved ticket '.$this->ticket_id.' successfull');
         } else {
-            TicketApproveJob::dispatch($this->ticket_id)->delay(now()->addHour());
+            TicketApproveJob::dispatch($this->ticket_id)->delay(now()->addSecond());
             Log::channel('tickets')->error('attrmpt to approved ticket '.$this->ticket_id.' failed');
         }
     }
